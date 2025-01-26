@@ -90,9 +90,7 @@ class TestAccountService(TestCase):
         """It should Create a new Account"""
         account = AccountFactory()
         response = self.client.post(
-            BASE_URL,
-            json=account.serialize(),
-            content_type="application/json"
+            BASE_URL, json=account.serialize(), content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -117,9 +115,7 @@ class TestAccountService(TestCase):
         """It should not Create an Account when sending the wrong media type"""
         account = AccountFactory()
         response = self.client.post(
-            BASE_URL,
-            json=account.serialize(),
-            content_type="test/html"
+            BASE_URL, json=account.serialize(), content_type="test/html"
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
@@ -128,8 +124,7 @@ class TestAccountService(TestCase):
         """It shold Read a single Account"""
         account = self._create_accounts(1)[0]
         response = self.client.get(
-            f"{BASE_URL}/{account.id}",
-            content_type="application/json"
+            f"{BASE_URL}/{account.id}", content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -139,8 +134,7 @@ class TestAccountService(TestCase):
         """It should not Read an account when the account does not exist"""
         account_test_id = 0
         response = self.client.get(
-            f"{BASE_URL}/{account_test_id}",
-            content_type="application/json"
+            f"{BASE_URL}/{account_test_id}", content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -151,4 +145,18 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 5)
-        pass
+
+    def test_update_account(self):
+        """It should Update and existing Account"""
+
+        test_account = AccountFactory()  # create an Account to update
+        response = self.client.post(BASE_URL, json=test_account.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Update the Account
+        new_account = response.get_json()
+        new_account["name"] = "Peter"
+        response = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_account = response.get_json()
+        self.assertEqual(updated_account["name"], "Peter")
