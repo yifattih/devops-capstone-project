@@ -160,7 +160,7 @@ class TestAccountService(TestCase):
         updated_account = response.get_json()
         self.assertEqual(updated_account["name"], "Peter")
 
-        # Update not existing Account
+        # Sad Path: Update not existing Account
         response = self.client.put(f"{BASE_URL}/0", json=new_account)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -169,3 +169,13 @@ class TestAccountService(TestCase):
         account = self._create_accounts(1)[0]
         response = self.client.delete(f"{BASE_URL}/{account.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method"""
+        response = self.client.delete(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+    def test_account_string_repr(self):
+        """It should show an Account object string representation"""
+        account = self._create_accounts(1)[0]
+        self.assertEqual(repr(account), f"<Account {account.name} id=[{account.id}]>")
