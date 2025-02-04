@@ -174,7 +174,7 @@ class TestAccountService(TestCase):
         """It should not allow an illegal method"""
         response = self.client.delete(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-    
+
     def test_account_string_repr(self):
         """It should show an Account object string representation"""
         account = self._create_accounts(1)[0]
